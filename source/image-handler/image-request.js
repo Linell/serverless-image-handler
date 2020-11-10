@@ -28,6 +28,18 @@ class ImageRequest {
             this.edits = this.parseImageEdits(event, this.requestType);
             this.originalImage = await this.getOriginalImage(this.bucket, this.key);
 
+            if (process.env.WHITELIST_SIZES == 'true') {
+              if ('resize' in this.edits) {
+                if ('width' in this.edits.resize) {
+                  this.edits.resize.width = this.getNearestAllowedWidth(this.edits.resize.width)
+                }
+
+                if ('height' in this.edits.resize) {
+                  this.edits.resize.height = this.getNearestAllowedHeight(this.edits.resize.height)
+                }
+              }
+            }
+
             /* Decide the output format of the image.
              * 1) If the format is provided, the output format is the provided format.
              * 2) If headers contain "Accept: image/webp", the output format is webp.
@@ -296,6 +308,47 @@ class ImageRequest {
         }
 
         return null;
+    }
+
+    /**
+     * Return the nearest size allowed for width.
+     * @param {Integer} width - The requested width.
+     */
+    getNearestAllowedWidth(width) {
+      let allowedWidths = process.env.WHITELISTED_WIDTHS;
+      if (allowedWidths === "" || allowedWidths === undefined) {
+        return width;
+      } else {
+        allowedWidths = allowedWidths.split(',').map(w => parseInt(w));
+        return this.nearestDimension(parseInt(width), allowedWidths)
+      }
+    }
+
+    /**
+     * Return the nearest size allowed for height.
+     * @param {Integer} height - The requested height.
+     */
+    getNearestAllowedHeight(height) {
+      let allowedHeights = process.env.WHITELISTED_HEIGHTS;
+      if (allowedHeights === "" || allowedHeights === undefined) {
+        return height;
+      } else {
+        allowedHeights = allowedHeights.split(',').map(w => parseInt(w));
+        return this.nearestDimension(parseInt(height), allowedHeights)
+      }
+    }
+
+    nearestDimension(value, allowedValues) {
+      return allowedValues.reduce((a, b) => {
+        let aDiff = Math.abs(a - value);
+        let bDiff = Math.abs(b - value);
+
+        if (aDiff == bDiff) {
+          return a > b ? a : b;
+        } else {
+          return bDiff < aDiff ? b: a;
+        }
+      });
     }
 }
 

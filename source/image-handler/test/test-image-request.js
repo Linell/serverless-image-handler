@@ -210,7 +210,205 @@ describe('setup()', function() {
             assert.deepEqual(imageRequest, expectedResult);
         });
     });
-    describe('006/errorCase', function() {
+    describe('006/resizeValueWhitelisting', function() {
+        it(`Should pass when any image resize request is provided (with no whitelisting)
+            and populate the ImageRequest object with the proper values`, async function() {
+            // Arrange
+            const event = {
+                path : '/fit-in/203x190/custom-image.jpg'
+            }
+            process.env = {
+                SOURCE_BUCKETS : "allowedBucket001, allowedBucket002",
+                REWRITE_MATCH_PATTERN: /(filters-)/gm,
+                REWRITE_SUBSTITUTION: 'filters:'
+            }
+            // ----
+            const S3 = require('aws-sdk/clients/s3');
+            const sinon = require('sinon');
+            const getObject = S3.prototype.getObject = sinon.stub();
+            getObject.withArgs({Bucket: 'allowedBucket001', Key: 'custom-image.jpg'}).returns({
+                promise: () => { return {
+                  CacheControl: 'max-age=300,public',
+                  ContentType: 'custom-type',
+                  Expires: 'Tue, 24 Dec 2019 13:46:28 GMT',
+                  LastModified: 'Sat, 19 Dec 2009 16:30:47 GMT',
+                  Body: Buffer.from('SampleImageContent\n')
+                }}
+            })
+            // Act
+            const imageRequest = new ImageRequest();
+            await imageRequest.setup(event);
+            const expectedResult = {
+                requestType: 'Custom',
+                bucket: 'allowedBucket001',
+                key: 'custom-image.jpg',
+                edits: {
+                  resize: {
+                    fit:    'inside',
+                    height: 190,
+                    width:  203
+                  }
+                },
+                originalImage: Buffer.from('SampleImageContent\n'),
+                CacheControl: 'max-age=300,public',
+                ContentType: 'custom-type',
+                Expires: 'Tue, 24 Dec 2019 13:46:28 GMT',
+                LastModified: 'Sat, 19 Dec 2009 16:30:47 GMT',
+            }
+            // Assert
+            assert.deepEqual(imageRequest, expectedResult);
+        });
+        it(`Should pass when an invalid image resize request is provided and whitelisting is
+            turned on but there are no selected sizes and populate the ImageRequest object 
+            with the proper values`, async function() {
+            // Arrange
+            const event = {
+                path : '/fit-in/203x190/custom-image.jpg'
+            }
+            process.env = {
+                SOURCE_BUCKETS : "allowedBucket001, allowedBucket002",
+                REWRITE_MATCH_PATTERN: /(filters-)/gm,
+                REWRITE_SUBSTITUTION: 'filters:',
+                WHITELIST_SIZES: 'true'
+            }
+            // ----
+            const S3 = require('aws-sdk/clients/s3');
+            const sinon = require('sinon');
+            const getObject = S3.prototype.getObject = sinon.stub();
+            getObject.withArgs({Bucket: 'allowedBucket001', Key: 'custom-image.jpg'}).returns({
+                promise: () => { return {
+                  CacheControl: 'max-age=300,public',
+                  ContentType: 'custom-type',
+                  Expires: 'Tue, 24 Dec 2019 13:46:28 GMT',
+                  LastModified: 'Sat, 19 Dec 2009 16:30:47 GMT',
+                  Body: Buffer.from('SampleImageContent\n')
+                }}
+            })
+            // Act
+            const imageRequest = new ImageRequest();
+            await imageRequest.setup(event);
+            const expectedResult = {
+                requestType: 'Custom',
+                bucket: 'allowedBucket001',
+                key: 'custom-image.jpg',
+                edits: {
+                  resize: {
+                    fit:    'inside',
+                    height: 190,
+                    width:  203
+                  }
+                },
+                originalImage: Buffer.from('SampleImageContent\n'),
+                CacheControl: 'max-age=300,public',
+                ContentType: 'custom-type',
+                Expires: 'Tue, 24 Dec 2019 13:46:28 GMT',
+                LastModified: 'Sat, 19 Dec 2009 16:30:47 GMT',
+            }
+            // Assert
+            assert.deepEqual(imageRequest, expectedResult);
+        });
+        it(`Should pass when an invalid image resize request is provided and whitelisting is turned on
+            and populate the ImageRequest object with the proper values`, async function() {
+            // Arrange
+            const event = {
+                path : '/fit-in/203x190/custom-image.jpg'
+            }
+            process.env = {
+                SOURCE_BUCKETS : "allowedBucket001, allowedBucket002",
+                REWRITE_MATCH_PATTERN: /(filters-)/gm,
+                REWRITE_SUBSTITUTION: 'filters:',
+                WHITELIST_SIZES: 'true',
+                WHITELISTED_WIDTHS: '25,50,150,200,250',
+                WHITELISTED_HEIGHTS: '25,50,150,200,250',
+            }
+            // ----
+            const S3 = require('aws-sdk/clients/s3');
+            const sinon = require('sinon');
+            const getObject = S3.prototype.getObject = sinon.stub();
+            getObject.withArgs({Bucket: 'allowedBucket001', Key: 'custom-image.jpg'}).returns({
+                promise: () => { return {
+                  CacheControl: 'max-age=300,public',
+                  ContentType: 'custom-type',
+                  Expires: 'Tue, 24 Dec 2019 13:46:28 GMT',
+                  LastModified: 'Sat, 19 Dec 2009 16:30:47 GMT',
+                  Body: Buffer.from('SampleImageContent\n')
+                }}
+            })
+            // Act
+            const imageRequest = new ImageRequest();
+            await imageRequest.setup(event);
+            const expectedResult = {
+                requestType: 'Custom',
+                bucket: 'allowedBucket001',
+                key: 'custom-image.jpg',
+                edits: {
+                  resize: {
+                    fit:    'inside',
+                    height: 200,
+                    width:  200
+                  }
+                },
+                originalImage: Buffer.from('SampleImageContent\n'),
+                CacheControl: 'max-age=300,public',
+                ContentType: 'custom-type',
+                Expires: 'Tue, 24 Dec 2019 13:46:28 GMT',
+                LastModified: 'Sat, 19 Dec 2009 16:30:47 GMT',
+            }
+            // Assert
+            assert.deepEqual(imageRequest, expectedResult);
+        });
+        it(`Should pass when an invalid image resize request is provided and whitelisting is turned on
+            and populate the ImageRequest object with the proper values`, async function() {
+            // Arrange
+            const event = {
+                path : '/fit-in/100x50/custom-image.jpg'
+            }
+            process.env = {
+                SOURCE_BUCKETS : "allowedBucket001, allowedBucket002",
+                REWRITE_MATCH_PATTERN: /(filters-)/gm,
+                REWRITE_SUBSTITUTION: 'filters:',
+                WHITELIST_SIZES: 'true',
+                WHITELISTED_WIDTHS: '25,50,100',
+                WHITELISTED_HEIGHTS: '25',
+            }
+            // ----
+            const S3 = require('aws-sdk/clients/s3');
+            const sinon = require('sinon');
+            const getObject = S3.prototype.getObject = sinon.stub();
+            getObject.withArgs({Bucket: 'allowedBucket001', Key: 'custom-image.jpg'}).returns({
+                promise: () => { return {
+                  CacheControl: 'max-age=300,public',
+                  ContentType: 'custom-type',
+                  Expires: 'Tue, 24 Dec 2019 13:46:28 GMT',
+                  LastModified: 'Sat, 19 Dec 2009 16:30:47 GMT',
+                  Body: Buffer.from('SampleImageContent\n')
+                }}
+            })
+            // Act
+            const imageRequest = new ImageRequest();
+            await imageRequest.setup(event);
+            const expectedResult = {
+                requestType: 'Custom',
+                bucket: 'allowedBucket001',
+                key: 'custom-image.jpg',
+                edits: {
+                  resize: {
+                    fit:    'inside',
+                    height: 25,
+                    width:  100
+                  }
+                },
+                originalImage: Buffer.from('SampleImageContent\n'),
+                CacheControl: 'max-age=300,public',
+                ContentType: 'custom-type',
+                Expires: 'Tue, 24 Dec 2019 13:46:28 GMT',
+                LastModified: 'Sat, 19 Dec 2009 16:30:47 GMT',
+            }
+            // Assert
+            assert.deepEqual(imageRequest, expectedResult);
+        });
+    });
+    describe('007/errorCase', function() {
         it(`Should pass when an error is caught`, async function() {
             // Assert
             const event = {
