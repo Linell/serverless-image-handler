@@ -102,6 +102,27 @@
         "No"
       ],
       "Description": "Would you like to enable automatic WebP based on accept headers? Select 'Yes' if so."
+    },
+    "WhiteListSizes": {
+      "Type": "String",
+      "Default": "No",
+      "AllowedValues": [
+        "Yes",
+        "No"
+      ],
+      "Description": "Should image resize requests be based around whitelisted sizes? Select 'Yes' if so."
+    },
+    "WhiteListedWidths": {
+      "Type": "String",
+      "Default": "25,50,100,150,200,250,300,350,400,450,500,1000,1200",
+      "AllowedPattern": ".+",
+      "Description": "A comma separated list of widths."
+    },
+    "WhiteListedHeights": {
+      "Type": "String",
+      "Default": "25,50,100,150,200,250,300,350,400,450,500,1000,1200",
+      "AllowedPattern": ".+",
+      "Description": "A comma separated list of heights."
     }
   },
   "Mappings": {
@@ -324,6 +345,15 @@
             },
             "SOURCE_BUCKETS": {
               "Ref": "SourceBuckets"
+            },
+            "WHITELIST_SIZES": {
+              "Ref": "WhiteListSizes"
+            },
+            "WHITELISTED_WIDTHS": {
+              "Ref": "WhiteListedWidths"
+            },
+            "WHITELISTED_HEIGHTS": {
+              "Ref": "WhiteListedHeights"
             },
             "REWRITE_MATCH_PATTERN": "",
             "REWRITE_SUBSTITUTION": ""

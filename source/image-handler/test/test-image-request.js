@@ -269,7 +269,7 @@ describe('setup()', function() {
                 SOURCE_BUCKETS : "allowedBucket001, allowedBucket002",
                 REWRITE_MATCH_PATTERN: /(filters-)/gm,
                 REWRITE_SUBSTITUTION: 'filters:',
-                WHITELIST_SIZES: 'true'
+                WHITELIST_SIZES: 'Yes'
             }
             // ----
             const S3 = require('aws-sdk/clients/s3');
@@ -311,13 +311,13 @@ describe('setup()', function() {
             and populate the ImageRequest object with the proper values`, async function() {
             // Arrange
             const event = {
-                path : '/fit-in/203x190/custom-image.jpg'
+                path : '/fit-in/204x195/custom-image.jpg'
             }
             process.env = {
                 SOURCE_BUCKETS : "allowedBucket001, allowedBucket002",
                 REWRITE_MATCH_PATTERN: /(filters-)/gm,
                 REWRITE_SUBSTITUTION: 'filters:',
-                WHITELIST_SIZES: 'true',
+                WHITELIST_SIZES: 'Yes',
                 WHITELISTED_WIDTHS: '25,50,150,200,250',
                 WHITELISTED_HEIGHTS: '25,50,150,200,250',
             }
@@ -367,7 +367,7 @@ describe('setup()', function() {
                 SOURCE_BUCKETS : "allowedBucket001, allowedBucket002",
                 REWRITE_MATCH_PATTERN: /(filters-)/gm,
                 REWRITE_SUBSTITUTION: 'filters:',
-                WHITELIST_SIZES: 'true',
+                WHITELIST_SIZES: 'Yes',
                 WHITELISTED_WIDTHS: '25,50,100',
                 WHITELISTED_HEIGHTS: '25',
             }

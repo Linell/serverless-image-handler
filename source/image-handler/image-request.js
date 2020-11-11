@@ -28,7 +28,7 @@ class ImageRequest {
             this.edits = this.parseImageEdits(event, this.requestType);
             this.originalImage = await this.getOriginalImage(this.bucket, this.key);
 
-            if (process.env.WHITELIST_SIZES == 'true') {
+            if (process.env.WHITELIST_SIZES == 'Yes') {
               if ('resize' in this.edits) {
                 if ('width' in this.edits.resize) {
                   this.edits.resize.width = this.getNearestAllowedWidth(this.edits.resize.width)

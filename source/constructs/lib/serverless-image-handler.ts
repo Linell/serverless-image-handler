@@ -26,6 +26,9 @@ export interface ServerlessImageHandlerProps {
   readonly deployDemoUiParameter: CfnParameter;
   readonly logRetentionPeriodParameter: CfnParameter;
   readonly autoWebPParameter: CfnParameter;
+  readonly whiteListSizesParameter: CfnParameter;
+  readonly whiteListedWidthsParameter: CfnParameter;
+  readonly whiteListedHeightsParameter: CfnParameter;
 }
 
 /**
@@ -141,6 +144,9 @@ export class ServerlessImageHandler extends Construct {
           CORS_ENABLED: props.corsEnabledParameter.valueAsString,
           CORS_ORIGIN: props.corsOriginParameter.valueAsString,
           SOURCE_BUCKETS: props.sourceBucketsParameter.valueAsString,
+          WHITELIST_SIZES: props.whiteListSizesParameter.valueAsString,
+          WHITELISTED_WIDTHS: props.whiteListedWidthsParameter.valueAsString,
+          WHITELISTED_HEIGHTS: props.whiteListedHeightsParameter.valueAsString,
           REWRITE_MATCH_PATTERN: '',
           REWRITE_SUBSTITUTION: ''
         }
