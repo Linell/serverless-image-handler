@@ -67,6 +67,18 @@ class ImageRequest {
                 delete this.headers;
             }
 
+            if (process.env.WHITELIST_SIZES == 'Yes') {
+              if ('resize' in this.edits) {
+                if ('width' in this.edits.resize) {
+                  this.edits.resize.width = this.getNearestAllowedWidth(this.edits.resize.width)
+                }
+
+                if ('height' in this.edits.resize) {
+                  this.edits.resize.height = this.getNearestAllowedHeight(this.edits.resize.height)
+                }
+              }
+            }
+
             // If the original image is SVG file and it has any edits but no output format, change the format to WebP.
             if (this.ContentType === 'image/svg+xml'
                 && this.edits && Object.keys(this.edits).length > 0
@@ -375,6 +387,47 @@ class ImageRequest {
         }
 
         return null;
+    }
+
+    /**
+     * Return the nearest size allowed for width.
+     * @param {Integer} width - The requested width.
+     */
+    getNearestAllowedWidth(width) {
+      let allowedWidths = process.env.WHITELISTED_WIDTHS;
+      if (allowedWidths === "" || allowedWidths === undefined) {
+        return width;
+      } else {
+        allowedWidths = allowedWidths.split(',').map(w => parseInt(w));
+        return this.nearestDimension(parseInt(width), allowedWidths)
+      }
+    }
+
+    /**
+     * Return the nearest size allowed for height.
+     * @param {Integer} height - The requested height.
+     */
+    getNearestAllowedHeight(height) {
+      let allowedHeights = process.env.WHITELISTED_HEIGHTS;
+      if (allowedHeights === "" || allowedHeights === undefined) {
+        return height;
+      } else {
+        allowedHeights = allowedHeights.split(',').map(w => parseInt(w));
+        return this.nearestDimension(parseInt(height), allowedHeights)
+      }
+    }
+
+    nearestDimension(value, allowedValues) {
+      return allowedValues.reduce((a, b) => {
+        let aDiff = Math.abs(a - value);
+        let bDiff = Math.abs(b - value);
+
+        if (aDiff == bDiff) {
+          return a > b ? a : b;
+        } else {
+          return bDiff < aDiff ? b: a;
+        }
+      });
     }
 }
 

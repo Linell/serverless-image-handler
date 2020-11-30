@@ -82,6 +82,24 @@ export class ConstructsStack extends cdk.Stack {
       description: 'The name of the default fallback image object key including prefix. e.g. prefix/image.jpg',
       default: ''
     });
+    const whiteListSizesParameter = new CfnParameter(this, 'WhiteListSizes', {
+      type: 'String',
+      description: `Should image resize requests be based around whitelisted sizes? Select 'Yes' if so.`,
+      default: 'No',
+      allowedValues: [ 'Yes', 'No' ]
+    });
+    const whiteListedWidthsParameter = new CfnParameter(this, 'WhiteListedWidths', {
+      type: 'String',
+      description: `A comma separated list of widths.`,
+      default: '25,50,100,150,200,250,300,350,400,450,500,1000,1200',
+      allowedPattern: '.+'
+    });
+    const whiteListedHeightsParameter = new CfnParameter(this, 'WhiteListedHeights', {
+      type: 'String',
+      description: `A comma separated list of heights.`,
+      default: '25,50,100,150,200,250,300,350,400,450,500,1000,1200',
+      allowedPattern: '.+'
+    });
 
     // CFN descrption
     this.templateOptions.description = `(SO0023) - Serverless Image Handler with aws-solutions-constructs: This template deploys and configures a serverless architecture that is optimized for dynamic image manipulation and delivery at low latency and cost. Leverages SharpJS for image processing. Template version ${VERSION}`;
@@ -147,7 +165,10 @@ export class ConstructsStack extends cdk.Stack {
       secretsManagerKeyParameter,
       enableDefaultFallbackImageParameter,
       fallbackImageS3BucketParameter,
-      fallbackImageS3KeyParameter
+      fallbackImageS3KeyParameter,
+      whiteListSizesParameter,
+      whiteListedWidthsParameter,
+      whiteListedHeightsParameter
     };
 
     // Serverless Image Handler Construct

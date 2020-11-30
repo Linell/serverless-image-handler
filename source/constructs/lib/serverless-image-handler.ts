@@ -32,6 +32,9 @@ export interface ServerlessImageHandlerProps {
   readonly enableDefaultFallbackImageParameter: CfnParameter;
   readonly fallbackImageS3BucketParameter: CfnParameter;
   readonly fallbackImageS3KeyParameter: CfnParameter;
+  readonly whiteListSizesParameter: CfnParameter;
+  readonly whiteListedWidthsParameter: CfnParameter;
+  readonly whiteListedHeightsParameter: CfnParameter;
 }
 
 /**
@@ -164,7 +167,10 @@ export class ServerlessImageHandler extends Construct {
           SECRET_KEY: props.secretsManagerKeyParameter.valueAsString,
           ENABLE_DEFAULT_FALLBACK_IMAGE: props.enableDefaultFallbackImageParameter.valueAsString,
           DEFAULT_FALLBACK_IMAGE_BUCKET: props.fallbackImageS3BucketParameter.valueAsString,
-          DEFAULT_FALLBACK_IMAGE_KEY: props.fallbackImageS3KeyParameter.valueAsString
+          DEFAULT_FALLBACK_IMAGE_KEY: props.fallbackImageS3KeyParameter.valueAsString,
+          WHITELIST_SIZES: props.whiteListSizesParameter.valueAsString,
+          WHITELISTED_WIDTHS: props.whiteListedWidthsParameter.valueAsString,
+          WHITELISTED_HEIGHTS: props.whiteListedHeightsParameter.valueAsString
         }
       });
       const cfnImageHandlerFunction = imageHandlerFunction.node.defaultChild as cdkLambda.CfnFunction;
