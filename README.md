@@ -49,6 +49,15 @@ export SOLUTION_NAME=my-solution-name # the solution name
 export VERSION=my-version # version number for the customized code
 ```
 
+Example values are:
+
+```bash
+export REGION=us-west-1
+export DIST_OUTPUT_BUCKET=serverless-image-resize-code
+export SOLUTION_NAME=serverless-image-resize
+export VERSION=1.1
+```
+
 ### 4. Create an Amazon S3 Bucket
 The CloudFormation template is configured to pull the Lambda deployment packages from Amazon S3 bucket in the region the template is being launched in. Create a bucket in the desired region with the region name appended to the name of the bucket.
 ```bash
